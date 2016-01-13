@@ -1,0 +1,178 @@
+---
+title: "SMekala_Assign4"
+author: "Sekhar Mekala"
+date: "Thursday, September 17, 2015"
+output: html_document
+---
+
+##Problem set 1
+
+Given that **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3  \\ -1 & 0 & 4 \end{array} \right]$$** 
+
+Here is the R Code to get the value of $X$ and $Y$, where $X = AA^T$ and $Y = A^T A$
+
+
+```{r}
+
+A <- matrix(c(1,2,3,-1,0,4),byrow = T, nrow = 2)
+
+X <- A %*% t(A)
+
+print(X)
+
+Y <- t(A) %*% A
+
+print(Y)
+
+```
+
+Finding the eigen values and eigen vectors of X:
+
+
+```{r}
+eigen(X)
+```
+
+
+Similarly for Y, we can get the eigen values as given below:
+
+
+```{r}
+eigen(Y)
+```
+
+Let us get the **singular value decomposition** of $A$, using the $svd()$ function of R:
+
+
+```{r}
+svd(A)
+```
+
+If you observe closely, the $eigen(X)$ and the $u$ component (obtained in $svd(A)$ output) are the same (except that the first vector's signs are opposite to each other)).
+
+Similarly, the $eigen(Y)$ and the $v$ component (obtained in $svd(A)$ output) are the same (except that the first vector's signs are opposite to each other)
+
+The negative signs of the first vectors in $eigen(X)$ and $eigen(Y)$ would cancel out each other, if we express A using $eigen(X)$, $eigen(Y)$ and the eigen values of $X$ and $Y$  (it is like multiplying with -1 twice). 
+
+The following R command, will verify, if we are able to express the matrix $A$ using the $eigen(X)$, $eigen(Y)$ and the *eigen values* of $X$ and $Y$. 
+
+**NOTE** that we are not changing the sign of the first vectors in $eigen(X)$ and $eigen(Y)$ matrices. Also we took the square root of the eigen values obtained for $X$ and $Y$ (Eigen values for both $X$ and $Y$ are the same, except that $Y$ has an extra eigen value of 0). The below command's output shows that even though the first vectors signs are different (when compared to the first vectors of $u$ and $v$ matrices of $svd(A)$ command), the negative signs will cancel out and gives us the matrix $A$ back, as shown below.
+
+
+```{r}
+
+eigen(X)$vectors %*% matrix(sqrt(c(26.601802, 0,0,0, 4.398198,0)), nrow = 2, byrow = T) %*% t(eigen(Y)$vectors)
+
+```
+
+The following code verifies, if we are able to produce the $A$ matrix back, using the left singular matrix ($u$), singular values and right singular matrix ($v$) of the $svd(A)$ command. NOTE that we have to take the transpose of $v$ component of svd() output:
+
+```{r}
+
+svd_eval <- svd(A)
+
+
+svd_eval$u %*% diag(svd_eval$d) %*% t(svd_eval$v)
+
+```
+
+Hence proved.
+
+
+##Problem set 2
+
+The following R code will compute the inverse of a matrix, by means of co-factors method:
+
+```{r}
+
+myinverse <- function(A)
+{
+  rows <- nrow(A)
+  cols <- ncol(A)
+
+  #Return if the matrix is not a square matrix
+  
+  if (rows != cols)
+  {
+    return ("The inverse cannot be found for the given matrix, since it is NOT a square matrix")
+  }
+  
+  
+  #Finding the co-factor matrix. Initializing B matrix with A values. The B matrix elements are replaced with co-factors.
+  
+  B <- A
+  
+  for (i in 1:rows)
+  {
+    for (j in 1:cols)
+    {
+      B[i, j] <- (((-1)^(i+j)) * det(A[-i, -j]))
+      
+    }
+  }
+  
+  
+  #Applying the transpose(B) / |A|.
+  
+  det_A = det(A)
+  if (det_A == 0) 
+    return("The given matrix is singular. Inverse is not possible for this matrix")
+  
+  A_INV <- t(B)/det(A)
+  
+  return(A_INV)
+}
+```
+
+
+##Test Cases:
+
+###Test case 1###
+
+```{r}
+s <- matrix(c(1,9,3,4,19,3,4,45,12), nrow = 3)
+print(s)
+myinverse(s)
+
+myinverse(s) %*% s
+```
+
+The above output shows the inverse of the given matrix, and also verifies that the inverse of the matrix when multiplied with itself will give an Identity matrix (the diagonal elements are almost 1 and the non-diagonal elements are close to 0, in the above display).
+
+###Test case 2###
+
+```{r}
+s <- matrix(c(1,2,3,4,5,6,7,8,9), nrow = 3)
+print(s)
+myinverse(s)
+
+```
+
+The above message displays that the given matrix is singular, and hence inverse was not computed.
+
+
+###Test case 3###
+
+```{r}
+s <- matrix(c(1,10,-9,11,15,-6,17,-8,19,34,-12,-11,-3,-10,10,16), nrow = 4)
+print(s)
+myinverse(s)
+myinverse(s) %*% s
+```
+
+The above output shows the inverse of the given matrix, and also verifies that the inverse of the matrix when multiplied with itself will give an Identity matrix (the diagonal elements are almost 1 and the non-diagonal elements are close to 0, in the above display).
+
+###Test case 4###
+
+```{r}
+s <- matrix(c(1,10,-9,11,15,-6,17,-8,19,34,-12,-11,-3,-10,10,16), nrow = 2)
+print(s)
+myinverse(s)
+
+```
+
+The program did not find the inverse, since the input matrix supplied was NOT a square matrix.
+
+
+                                           ~~~~*** End of Home Work ***~~~~
+

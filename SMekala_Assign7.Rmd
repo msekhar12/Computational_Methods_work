@@ -1,0 +1,249 @@
+---
+title: "SMekala_Assign7"
+author: "Sekhar Mekala"
+date: "Monday, September 28, 2015"
+output: html_document
+---
+##Problem set 1
+
+The mean of a set of numbers is obtained by the sum of the numbers divided by the number of observations.
+
+If we have a set of real numbers $x_{1}, x_{2}, x_{3},...,x_{n}$, then the mean (denoted by $\mu$) of these is given by the following formula:
+
+$$\mu = \frac{x_{1} + x_{2} + x_{3} +... + x_{n}}{n}$$
+
+The mean for the population is represented by $\mu$ and the mean of a sample is denoted by $\bar{x}$
+
+But note that the method to find the mean remains the same. 
+
+There are two kinds of standard deviations (standard deviation of the population) and (standard deviation of the sample):
+
+###Standard deviation of the population($\sigma$):
+
+$$\sigma = \sqrt{\frac{1}{N}\sum_{i=1}^{N} {(x_{i} - \mu)^2}}$$
+where $N$ is the number of elements in the population $x_{1}, , x_{2}, x_{3},...,x_{n}$, and $\mu$ represents the population mean.
+
+###Standard deviation of the sample($s$):
+
+$$s = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n} {(x_{i} - \bar{x})^2}}$$
+where $n$ is the number of elements in the sample $x_{1}, , x_{2}, x_{3},...,x_{n}$, and $\bar{x}$ represents the sample mean.
+
+In the theory of probability (discrete Random Variable), the average value or mean of a random variable $X$ is given by $E(X) = P(X = x_{1}) . x_{1} + P(X = x_{2}) . x_{2} + ... + P(X = x_{n}) . x_{n}$ (where $X$ will take numeric values $x_{1}, x_{2}, x_{3},...,x_{n}$, and each value $x_{i}$ represets a numeric value assigned to the elementary events of a random experiment). This formula E(X) given calculates the mean of the population. Also the standard deviation of the Random variable $X$ is found by the formula $\sqrt{E[X^2] - (E[X])^2}$. This formula finds the standard deviation of the population. 
+
+In R we have two functions **mean()** and **sd()**, which helps to find the mean and standard deviation (std. dev.) of the **sample** respectively. As per the assignment, we have to write two functions which find the mean and std. deviation, and these functions must match the output obtained from mean() and sd(). Since the functions mean() and sd() considers the input as sample, we will base our logic of finding std. dev by treating the input vector as a sample.
+
+The R code to find the mean follows.
+
+```{r}
+#The function expects an array of numeric values, and finds the mean. of these values.
+#The function returns an error, if there is any non-numeric value in the vector
+
+
+my_mean <- function(x)
+{
+  if(is.numeric(x)){
+     return(sum(x)/length(x))  
+  }
+  
+  else return("Error. Please supply Numeric values only")
+  
+}
+
+
+```
+
+The R code to find the std. dev. follows.
+
+```{r}
+#The function expects an array of numeric values, and finds the std. dev. of these values.
+#The function returns an error, if there is any non-numeric value in the vector
+#The function uses the formula used to find the std. dev. of the sample
+#This function uses my_mean
+
+my_std_dev <- function(x)
+{
+
+  if(is.numeric(x)){
+    if (length(x) == 1) return(0)
+    return(sqrt(sum((x - my_mean(x))^2)/(length(x) - 1)))
+  }
+  
+  else return("Error. Please supply Numeric values only")
+  
+}
+```
+
+
+##Test cases
+
+###Test case 1:
+
+Finding the mean and std. dev of the values: {1,2,40,2,20,35,29}
+
+```{r}
+x <- c(1,2,40,2,20,35,29)
+my_mean(x)
+my_std_dev(x)
+```
+
+Finding the mean and std. dev using the in-built R functions mean() and sd()
+
+```{r}
+mean(x)
+sd(x)
+```
+
+Our functions **my_mean()** and **my_std_dev()** have found the same values as the built-in functions **mean()** and **sd()**
+
+
+
+###Test case 2:
+
+Finding the mean and std. dev of the values: {1,2,40,2,20,35,'p','q'}
+
+```{r}
+x <- c(1,2,40,2,20,35,29,'p','q')
+my_mean(x)
+my_std_dev(x)
+```
+
+The above fnction calls with non-numeric values in the array, will throw an error in finding the mean and std. dev
+
+
+#Finding the mean and standard deviation for an infinite stream of numbers
+
+Let us suppose that we already know the mean (say $\mu_{n-1}$) of the numbers $x_{1}, x_{2}, x_{3},...,x_{n-1}$, and a new number is added ($x_{n}$) to the list, then what will be the new mean? There are two ways to find this. 
+
+* The first method is $\frac{x_{1} + x_{2} + x_{3} +... + x_{n-1} + x_{n}}{n}$. 
+
+* And the other method will be: $$\frac{\mu_{n-1} . (n-1) + x_{n}}{n}$$
+
+The proof of the second method is given below:
+
+From the calculation $\frac{x_{1} + x_{2} + x_{3} +... + x_{n-1} + x_{n}}{n}$, we can replace the sum of $x_{1} + x_{2} + x_{3} +... + x_{n-1}$ with $(n-1).\mu_{n-1}$ (since $\mu_{n-1} = \frac{x_{1} + x_{2} + x_{3} +... + x_{n-1} + x_{n-1}}{n-1}$)
+
+Hence when ever a new number arrives (say the $n^{th}$), then we have to update the new mean using the formula given below:
+
+$$\mu_{updated} = \frac{\mu_{old} . (n-1) + x_{n}}{n}$$
+where $x_{n}$ is the new element arrived in the stream, $\mu_{updated}$ is the new mean, and $n$ is the number of elements arrived till now (including the $x_{n}$ element)
+
+The above formula can be further simplified as:
+
+$$\mu_{updated} = \mu_{old} + \frac{x_{n} - \mu_{old}}{n}$$
+
+Hence to find the running mean, we need to maintain the count of elements that arrive in the stream, and update the count as and when a new element arrives. We should also update the existing mean with the new mean, whenever a new element arrives.
+
+I could not find a similar derivation for the Standard deviation for an infinite stream of numbers. In the book **"The art of computer programming"**, I found the following algorithm to find the running std. dev. 
+
+###Algorithm to find running std. dev. and running mean
+   1. Initialize $s_{old} = 0$, and $\mu_{old} = x_{1}$
+
+   Repeat the following steps whenever a new element arrives:
+
+   1. Whenever a new element ($x_{new}$) arrives, find the new mean $\mu_{new} = \mu_{old} + \frac{x_{new} - \mu_{old}}{n}$
+   2. Calculate the expression $s_{new} = s_{old} + (x_{new} - \mu_{old}) * (x_{new} - \mu_{new})$
+   3. The new std. dev is $\sigma_{new} = \sqrt{\frac{s_{new}}{n - 1}}$
+   3. Set $s_{old} = s_{new}$ and $\mu_{old} = \mu_{new}$
+
+
+In the following R code, we generate a series of 1000 integers (randomly, with replacement), and calculate the mean and std. dev., reading one element at a time. This kind of processing simulates a stream of elements. We finally show that the std.dev and mean values computed by processing each element at a time is the same as the std. dev and mean calculated by considering all the 1000 numbers at a time.
+
+###Testing the algorithm
+```{r}
+
+#Generate 1000 random numbers
+x <- sample(1:1000, 1000, replace=T)
+old_mean = x[1]
+old_sd = 0
+
+new_mean <- vector()
+new_sd <- vector()
+new_s <- vector()
+
+new_mean[1] = x[1]
+new_s[1] = 0
+for(i in 2:length(x))
+  {
+  
+    new_mean[i] = new_mean[i-1] + ((x[i] - new_mean[i-1])/i)
+    new_s[i] = new_s[i-1] + ( (x[i] - new_mean[i-1]) * (x[i] - new_mean[i]))
+    new_sd[i] = sqrt(new_s[i]/(i-1))
+  }
+
+print(new_mean[1000])
+print(new_sd[1000])
+
+mean(x)
+sd(x)
+```
+
+The above mean and std. dev computed (by considering each element of the array, as a stream) is the same as the mean and std. dev found by considering all the array elements at the same time.
+
+The above logic to compute the mean and std. dev for a stream is implemented as a function **streaming_mean_sd()** with the following code. Follow the comments embedded in the function definition about the list of input arguments and the output values returned.
+
+###Implementing the algorithm as a function
+```{r}
+
+streaming_mean_sd <- function(current_mean, current_sd, current_element_count, new_element)
+{
+#Function calculates the mean and std. dev, as and when a new element arrives. 
+#It takes the following parms:
+#current_mean - current mean
+#current_sd - current std. dev
+#current_element_count - number of elements in the current stream, excluding the new element
+#new_element - new element arrived
+
+#The function returns a list containing the new mean and new std. dev
+  
+old_mean = current_mean
+old_sd = current_sd
+old_s = (old_sd^2)*(current_element_count - 1)
+new_element_count = current_element_count + 1
+
+new_mean = old_mean + ((new_element - old_mean)/new_element_count)
+
+new_s = old_s + ( (new_element - old_mean) * (new_element - new_mean))
+new_sd = sqrt(new_s/(new_element_count - 1))
+
+return (list(new_mean = new_mean, new_sd = new_sd))
+}
+```
+
+Testing the function code, using the same array of 1000 numbers:
+
+```{r}
+
+new_mean <- vector()
+new_sd <- vector()
+new_list <- list()
+
+new_mean[1] <- x[1]
+new_sd[1] <- 0
+n <- length(x)
+for(i in 2:n)
+  {
+  new_list <- streaming_mean_sd(new_mean[i-1], new_sd[i-1], i-1, x[i])
+  new_mean[i] <- new_list$new_mean[1]
+  new_sd[i] <- new_list$new_sd[1]
+  }
+
+print(new_mean[n])
+print(new_sd[n])
+
+print(mean(x))
+print(sd(x))
+
+```
+
+The above display confirms that our function code works well.
+
+```{r}
+plot( x,new_mean, xlab = "Elements")
+plot(x,new_sd, xlab = "Elements")
+
+
+```
+
+The above graphs show how the mean and std. dev varies as the new element arrives in the stream.
+
+                                   ~~~**End of Assignment**~~~

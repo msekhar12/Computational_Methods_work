@@ -1,0 +1,154 @@
+---
+title: "SMekala_Assign3"
+author: "Sekhar Mekala"
+date: "Friday, September 11, 2015"
+output: html_document
+---
+
+##Problem set 1
+##(1)
+
+Given that **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 & 4 \\ -1 & 0 & 1 & 3 \\ 0 & 1 & -2 & 1 \\ 5 & 4 & -2 & -3 \end{array} \right]$$** 
+
+**Applying Row operations on matrix $A$:**
+
+**$R_{2} + R_{1}$ and $R_{4} - 5R_{1}$** makes **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 & 4 \\ 0 & 2 & 4 & 7 \\ 0 & 1 & -2 & 1 \\ 0 & -6 & -17 & -23 \end{array} \right]$$** 
+
+**$2R_{3} - R_{2}$ and $R_{4} + 3R_{2}$** makes **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 & 4 \\ 0 & 2 & 4 & 7 \\ 0 & 0 & -8 & -5 \\ 0 & 0 & -5 & -2 \end{array} \right]$$** 
+
+**$R_{3}/(-8), R_{4}/(-5)$ and $R_{2}/(2)$** makes **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 & 4 \\ 0 & 1 & 2 & 7/2 \\ 0 & 0 & 1 & 5/8 \\ 0 & 0 & 1 & 2/5 \end{array} \right]$$** 
+
+**$R_{4} - R_{3}$** makes **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 & 4 \\ 0 & 1 & 2 & 7/2 \\ 0 & 0 & 1 & 5/8 \\ 0 & 0 & 0 & -9/40 \end{array} \right]$$** 
+
+**$R_{4}/(-9/40)$** makes **$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 & 4 \\ 0 & 1 & 2 & 7/2 \\ 0 & 0 & 1 & 5/8 \\ 0 & 0 & 0 & 1 \end{array} \right]$$** 
+
+The above matrix is in **row-echelon** form. Since all the diagonal entries of the matrix are 1s, and since there are NO zero rows, we can conclude that the rank of the matrix as **4**
+
+
+##(2)
+Given that $m > n$ in an $mXn$ matrix. Therefore the **maximum** rank of this is the minumum of $m$ and $n$, which is $n$. Unless the matrix is a zero matrix, the minimum rank of a matrix is 1. For zero matrix, the rank is 0
+
+##(3)
+
+Given that 
+
+**$$ B = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 1 \\ 3 & 6 & 3 \\ 2 & 4 & 2 \end{array} \right]$$** 
+
+**Applying Row operations on matrix $B$:**
+
+**$R_{2} + 3R_{1}$ and $R_{3} - 2R_{1}$** makes **$$ B = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{array} \right]$$** 
+
+The matrix $B$ is in reduced row echelon form with 2 zero rows. Hence the matrix rank is **1** (Since we have only one non-zero row after reducing the matrix to row-echelon form)
+
+
+##Problem set 2
+
+Given that 
+**$$ A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{array} \right]$$**
+
+Since $A$ is a tringular matrix, the Eigen values are the diagonal entries. Hence the Eigen values of A are **1, 4, 6**. 
+
+
+The following method shows the traditional method of getting the Eigen values.
+
+Let $X$ be an Eigen vector of $A$ and let $\lambda$ be the Eigen value of $A$.
+
+In order for $X$ be an Eigen vector of $A$, the following must hold true:
+
+* $X$ is a non-zero vector 
+
+* $AX = \lambda X$
+
+The $AX = \lambda X$ can be expressed as:
+
+$AX = \lambda I X$ ==> $(\lambda I - A) X = 0$
+
+Since $X$ cannot be a non-zero vector. Therefore the $(\lambda I - A)$ must be a singular matrix, and for a singular matrix, the determinant is zero.
+
+Hence $$|(\lambda I - A)| = 0$$
+
+$$ ==> det \left( \mbox{} \left[ \begin{array}{ccc} \lambda & 0 & 0 \\ 0 & \lambda & 0 \\ 0 & 0 & \lambda \end{array} \right] - \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{array} \right] \right) = 0$$
+
+$$ ==> det \left( \mbox{} \left[ \begin{array}{ccc} \lambda - 1 & -2 & -3 \\ 0 & \lambda- 4 & -5 \\ 0 & 0 & \lambda -6 \end{array} \right] \right) = 0$$
+
+$$ ==> (\lambda - 1) ((\lambda - 4) (\lambda - 6) - (-5)(0)) + 2 ((0) (\lambda - 6) - (-5) (0)) -3 ((0)(0) -(0) (\lambda - 4)) = 0$$
+
+$$ ==> (\lambda - 1) (\lambda - 4) (\lambda - 6)  = 0$$
+
+$$ ==> (\lambda - 1) = 0,  (\lambda - 4) = 0,  (\lambda - 6)  = 0$$
+
+$$ ==> \lambda = 1, 4, 6 $$
+
+Hence the Eigen values for the given matrix $A$ are 1, 4, 6
+
+If you observe, these are the diagonal values of the matrix $A$.
+
+**Getting Eigen vectors**
+
+**For the Eigen value 1:**
+
+$$AX = 1.X$$
+$$ ==> \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{array}\right] . \left[ \begin{array}{ccc} x_{1} \\ x_{2} \\ x_{3} \end{array}\right] = \mbox{} 1 .  \left[ \begin{array}{ccc} x_{1} \\ x_{2} \\ x_{3} \end{array}\right] $$
+
+$$ ==> x_{1} + 2x_{2} +3x_{3} = x_{1} $$
+$$ ==> 4x_{2} +5x_{3} = x_{2} $$
+$$ ==> 6x_{3} = x_{3} $$
+
+The third equation is valid only for $x_{3} = 0$. Hence $x_{3} = 0$. Substituting $x_{3} = 0$ in the second equation, and we get $4x_{2} = x_{2}$. But this equation is also possible only for $x_{2} = 0$. Substituting $x_{2} = 0$ and $x_{3} = 0$ in first equation, will give $x_{1} = x_{1}$. So $x_{1}$ can be any value. If we assume that $x_{1} = t$, where $t \in \mathbb{R}$, we can express the Eigen vector, for Eigen value 1 as given below:
+
+$$\left[ \begin{array}{ccc} t \\ 0 \\ 0 \end{array}\right] $$
+
+But this can be further represented as the following (a constant and the basis vector product).
+
+$$t. \left[ \begin{array}{ccc} 1 \\ 0 \\ 0 \end{array}\right] $$
+
+**Hence the Eigen vector for Eigen value of 1 is the basis vector of the above vector $\left[ \begin{array}{ccc} 1 \\ 0 \\ 0 \end{array}\right]$**
+
+
+**For the Eigen value 4:**
+
+
+$$AX = 4.X$$
+$$ ==> \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{array}\right] . \left[ \begin{array}{ccc} x_{1} \\ x_{2} \\ x_{3} \end{array}\right] = \mbox{} 4 .  \left[ \begin{array}{ccc} x_{1} \\ x_{2} \\ x_{3} \end{array}\right] $$
+
+$$ ==> x_{1} + 2x_{2} +3x_{3} = 4x_{1} $$
+$$ ==> 4x_{2} +5x_{3} = 4x_{2} $$
+$$ ==> 6x_{3} = 4x_{3} $$
+
+The third equation is valid only for $x_{3} = 0$. Hence $x_{3} = 0$. Substituting $x_{3} = 0$ in the second equation, and we get $4x_{2} = 4x_{2}$. Hence $x_{2}$ can assume any real number, say $t$. Substituting $x_{2} = t$ and $x_{3} = 0$ in the first equation will give us $x_{1} = \frac{2t}{3}$
+Hence we obtain the following vector, $X$ as
+
+
+$$\left[ \begin{array}{ccc} \frac{2t}{3} \\ t \\ 0 \end{array}\right] $$
+
+The basis vector of $X$ is $\left[ \begin{array}{ccc} 0.5547002 \\ 0.8320503 \\ 0 \end{array}\right]$
+
+**Hence the Eigen vector for the Eigen value of 4 is $\left[ \begin{array}{ccc} 0.5547002 \\ 0.8320503 \\ 0 \end{array}\right]$ **
+
+
+**For the Eigen value 6:**
+
+
+$$AX = 6.X$$
+$$ ==> \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{array}\right] . \left[ \begin{array}{ccc} x_{1} \\ x_{2} \\ x_{3} \end{array}\right] = \mbox{} 6 .  \left[ \begin{array}{ccc} x_{1} \\ x_{2} \\ x_{3} \end{array}\right]$$
+
+$$ ==> x_{1} + 2x_{2} +3x_{3} = 6x_{1} $$
+$$ ==> 4x_{2} +5x_{3} = 6x_{2} $$
+$$ ==> 6x_{3} = 6x_{3} $$
+
+The third equation is valid only for $x_{3} = 1$. Hence $x_{3} = 1$. Substituting $x_{3} = 1$ in the second equation, and we get $x_{2} = 5/2$. Substituting $x_{2} = 5/2$ and $x_{3} = 1$ in the first equation will give us $x_{1} = 8/5$.
+
+Hence we obtain $X$ as $$\left[ \begin{array}{ccc} \frac{8}{5} \\ \frac{5}{2} \\ 1 \end{array}\right]$$
+
+The basis vector (unit vector) of the above vector is
+
+$$\left[ \begin{array}{ccc} 0.5108407 \\ 0.7981886 \\ 0.3192754 \end{array}\right] $$
+
+**Hence the Eigen vector for the Eigen value of 6 is $\left[ \begin{array}{ccc} 0.5108407 \\ 0.7981886 \\ 0.3192754 \end{array}\right]$ **
+
+
+**Hence for the given matrix $A$, we have the following:**
+
+**Eigen Values as 1, 4, 6** 
+
+**Eigen vectors as $\left[ \begin{array}{ccc} 0.5108407 \\ 0.7981886 \\ 0.3192754 \end{array}\right], \left[ \begin{array}{ccc} 0.5547002 \\ 0.8320503 \\ 0 \end{array}\right], \left[ \begin{array}{ccc} 1 \\ 0 \\ 0 \end{array}\right]$ for the Eigen values of 6, 4, 1 respectively.**

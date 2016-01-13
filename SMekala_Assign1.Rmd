@@ -1,0 +1,361 @@
+---
+title: "SMekala_Assign1"
+author: "Sekhar Mekala"
+date: "Saturday, August 29, 2015"
+output: html_document
+---
+
+##Problem set 1
+
+Given that 
+$$ u = [0.5, 0.5] $$ and $$ v = [3, -4] $$
+
+
+**1**. The dot product of **u** and **v** is
+
+$$ u.v = (0.5) . (3) + (0.5) . (-4) = 1.5 - 2 = -0.5 $$
+
+You can use the following R code to find the dot product of **u** and **v**
+
+```{r}
+u <- c(0.5, 0.5)
+v <- c(3, -4)
+
+sum(u*v)
+
+```
+
+
+
+**2**. Lengths of **u** and **v** are given below:
+
+$$ ||u|| = \sqrt{0.5^2 + 0.5^2} = \sqrt{0.25 + 0.25} = \sqrt(0.5) = 0.7071068$$
+$$ ||v|| = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = \sqrt(25) = 5$$
+
+Using R, to find the lengths of **u** and **v**
+
+```{r}
+sqrt(sum(u*u))
+sqrt(sum(v*v))
+```
+
+
+
+**3**. The linear combination of 3u - 2v is given below:
+
+$$ 3 . [0.5, 0.5] - 2. [3, -4] = [1.5 - 6, 1.5 + 8] = [-4.5, 9.5] $$
+
+Using R, to find the linear combination of **3u - 2v**
+```{r}
+3*u - 2*v
+
+```
+
+**4** The angle between **u** and **v** is found as follows:
+Let *x* be the angle between **u** and **v**. Then *x* is given by
+
+$$cos(x) = \frac{u . v}{||u|| ||v||} = \frac{-0.5}{(0.7071068) . (5)} = -0.1414214 $$
+$$x = cos^-1 (-0.1414214)$$
+$$x = 1.712693 radians $$
+$$x = 98.1301^o$$
+
+In R, we can find the angle between **u** and **v** with the following code
+```{r}
+#In radians:
+acos(sum(u*v)/( sqrt(sum(u*u)) *  sqrt(sum(v*v))))
+
+#In degrees:
+acos(sum(u*v)/( sqrt(sum(u*u)) *  sqrt(sum(v*v)))) * 180 / pi
+
+
+```
+
+
+
+
+
+##Problem set 2
+
+I created the following R functions to compute the reduced-row echelon form using Gauss-Jordan elimination method. The program can process any number of input variables, and finds the solution if exists. If the solution is not existing or if we have infinite number of solutions possible, then approprite message is displayed. 
+
+**find_first_and_divide** - This function takes a vector as input, and gives back another vector by dividing all the elements of the vector with the first non-zero element of the vector. The position of the first non-zero element is also appended to the returned vector.
+
+**row_echelon_form** - This function takes a matrix as an input and returns a list as the result. The augumented matrix is passed as input to this function. The function returns a list object with three items: 
+
+  * **msg**    Contains  any of three messages - *"NO solution found"*, *"Infinite number of solutions possible"* or *"Single solution is possible"*
+  * **m_mod**  Contains row-echelon form matrix
+  * **proceed_further** Contains 0 or 1. 0 means, stop processing further, since the given system of equations have either infinite number of solutions or no solution (depends on the message returned in the **msg**)
+  
+  
+  The **row_echelon_form** function makes use of an intermediary matrix called **operations_tracker**, which contains the position of the first non-zero value in each row, and also the corresponding row number. The whole logic depends on the **operations_tracker** matrix
+
+**reduced_row_echelon_form** - This function is the main driver function, and accepts two matrices as the input parameters (the coefficient matrix, and the constraint matrix). This function gives a list item as output with three items (if there exists only one solution to the system of given equations):
+
+  * **original_matrix**  Contains the input matrix (coefficient matrix supplied)
+  * **constraint_matrix** Contains the input constraint matrix
+  * **reduced_row_echelon_form** Contains the reduced row echelon form of the input matrix
+  * **solution** Contains the solution for the input coefficient matrix and constraint matrix
+
+
+  If the system has no solution or if the system has infinite solutions then another list is returned with the following items:
+  
+  * **original_matrix**  Contains the input matrix (coefficient matrix supplied)
+  * **constraint_matrix** Contains the input constraint matrix
+  * **msg** Contains the reason for why the solution was not computed (if no solution is available then "No solution found" is loaded into **msg**, if infinite number of solutions found, then "Infinite number of solutions possible" is loaded into **msg**)
+  
+
+  
+  
+
+##Source code (in R) to find the soultions to a system of equations
+
+
+```{r}
+
+#find_first_and_divide:
+#This function takes a vector as input. It finds the first non-zero element in the vector, and 
+#divides the remaining elements with the first non-zero element. The position of the non-zero element
+# is appended to the modified vector (after division), and the vector is returned
+
+
+find_first_and_divide <- function(x)
+{
+
+
+  
+  for( i in 1:length(x))
+  {
+    #if(x[i] == 1) return(data.frame(pos = i, newrow  = x))
+    #if(x[i] !=0) return(data.frame(pos = i, newrow = (x/x[i])))
+    
+    #if(x[i] == 1) return(list(pos = i, newrow  = x))
+    #if(x[i] !=0) return(list(pos = i, newrow = (x/x[i])))
+    
+    if(x[i] == 1) return(c(x,i))
+    if(x[i] !=0) return( c((x/x[i]),i))
+    
+  }
+  
+  #return(list(pos=i, newrow = x))
+  return(c(x,(i+1)))
+}
+
+
+## row_echelon_form - this function converts the input matrix into row echelon form and returns the converted matrix
+
+row_echelon_form <- function(m)
+  
+{
+  if(is.matrix(m))
+  {
+    #find the first non-zero element in each row, and divide the other elements by the first non-zero element
+    original <- m
+    m_rows <- nrow(m)
+    m_cols <- ncol(m)
+    m_mod <- matrix(nrow = m_rows, ncol =( m_cols+1))
+    operation_tracker <- matrix(nrow = m_rows, ncol = 2)
+    operation_tracker[,2] <- 1:m_rows
+    
+    repeat{
+      
+      m_mod <- t(apply(m,1,find_first_and_divide))
+      operation_tracker[,1] <- m_mod[,(m_cols+1)]
+      operation_tracker <- operation_tracker[order(operation_tracker[,1]),]
+      
+      m_mod <- m_mod[operation_tracker[,2],-(m_cols+1)]
+      
+      #Check if all the columns (except the last column) are zeros, and alert that NO solution exists
+      if(operation_tracker[m_rows,1] == m_cols) {return(list(msg="NO solution found",row_echelon=m_mod,proceed_further=0))}
+      
+      #Check if all the rows are zeros, and alert that infinite possible solutions
+      if(operation_tracker[m_rows,1] == (m_cols + 1)) return(list(msg="Infinite number of solutions possible",row_echelon=m_mod,proceed_further=0))
+      
+      
+      if (any((operation_tracker[-m_rows,1] - operation_tracker[-1,1]) == 0))
+      {
+        if(m_rows >= 2)
+        {
+          i <- 1
+          j <- 2
+          
+          repeat {
+            if (j > m_rows) break
+            if(operation_tracker[i,1] == operation_tracker[(j),1])
+            {
+              m_mod[operation_tracker[j,2],] <- ( m_mod[operation_tracker[j,2],] - m_mod[operation_tracker[i,2],] )
+              j <- (j+1)
+              
+            }
+            else {
+              i <- (j)
+              j <- (j + 1)
+            }
+          }
+          
+        }
+      }
+      
+      else return(list(msg="Single solution is possible", row_echelon=m_mod,proceed_further=1))
+      m <- m_mod
+    }
+    
+    
+    
+  } 
+  else return("Incorrect input. Supply matrix as input")
+  
+}
+
+
+## reduced_row_echelon_form - This is the main driver function. It accepts 2 parameters Coefficient matrix and constraint matrix
+
+reduced_row_echelon_form <- function(m,b)
+{
+ 
+  if(is.matrix(m) & is.matrix(b))
+  {
+    if(nrow(m) != nrow(b)) return("The number of rows in the input matrices are not identical")
+    original <- m
+    m <- cbind(m,b)
+    m_row_echelon <- row_echelon_form(m)
+    m <- m_row_echelon$row_echelon
+    
+    proceed_further <- m_row_echelon$proceed_further
+    if(proceed_further == 0) return(list(original_matrix=original,constraint_matrix = b, msg=m_row_echelon$msg, row_echelon_form=m))
+    
+    m_rows <- nrow(m)
+    m_cols <- ncol(m)
+    
+    
+    for(i in (1:m_rows))
+    {
+      x <- which(m[i,-m_cols] !=0)
+      x_l <- length(x)
+      
+      if(x_l > 1)
+      {
+        for(j in 2:x_l)
+        {
+          m[i,] <- (m[i,] - (m[x[j],] * m[i,x[j]]))
+        }
+      }
+      
+  
+    }
+
+return(list(original_matrix = original, constraint_matrix = b, reduced_row_echelon_form = m, solution=m[,m_cols]))
+  }
+  
+  else return("The supplied input objects are NOT matrix objects!!")
+  
+    
+  
+}
+
+```
+
+
+## Test run of the program
+
+### Test Case 1:
+
+Solve the following system of equations:
+
+$$ x1 + x2 + 3.x3 = 1$$
+$$ 2.x1 - x2 + 5.x3 = 2$$
+$$ -x1 - x2 + 4.x3 = 6$$
+
+```{r}
+
+A <- matrix(c(1,1,3,2,-1,5,-1,-2,4),byrow=T, nrow = 3)
+b <- matrix(c(1,2,6),byrow=T, nrow = 3)
+
+reduced_row_echelon_form(A,b)
+
+```
+
+Hence we obtained the solution as 
+$$x1 = -1.5454545$$
+$$x2 = -0.3181818$$
+$$x3 = 0.9545455$$
+
+### Test Case 2:
+Solve the following system of equations:
+
+$$ -2.x1 + x2 - x3 = 4$$
+$$ x1 + 2.x2 + 3.x3 = 13$$
+$$ 3.x1 + x3 = -1$$
+
+```{r}
+
+A <- matrix(c(-2,1,-1,1,2,3,3,0,1),byrow=T, nrow = 3)
+b <- matrix(c(4,13,-1),byrow=T, nrow = 3)
+
+reduced_row_echelon_form(A,b)
+
+```
+Hence we obtained the solution as
+$$x1 = -1$$
+$$x2 = 4$$
+$$x3 = 2$$
+
+### Test Case 3:
+Solve the following system of equations:
+$$x1 - 2.x2 + 3.x3 = -2$$
+$$-x1 + x2 - 2.x3 = 3$$
+$$2.x1 - x2 + 3.x3 = 1$$
+
+
+```{r}
+
+A <- matrix(c(1, -2, 3, -1, 1, -2, 2, -1, 3),byrow=T, nrow = 3)
+b <- matrix(c(-2, 3, 1),byrow=T, nrow = 3)
+
+reduced_row_echelon_form(A,b)
+
+```
+
+From the above display (of program output), we found that there is NO solution existing for the given system of equations. If you observe, the last row of the row echelon form is displayed as [0    0    0    1], and since 0 can never be equal to 1, we can conclude that we do not have any solution for the given system of equations.
+
+### Test Case 4:
+Solve the following system of equations:
+
+$$x1 - 2.x2 + 3.x3 = -2$$
+$$-x1 + x2 - 2.x3 = 3 $$
+$$2.x1 - x2 + 3.x3 = -7$$
+
+```{r}
+
+A <- matrix(c(1, -2, 3, -1, 1, -2, 2, -1, 3),byrow=T, nrow = 3)
+b <- matrix(c(-2, 3, -7),byrow=T, nrow = 3)
+
+reduced_row_echelon_form(A,b)
+
+```
+
+From the above display (of program output), we found that there are infinite possible solutions for the given system of equations. If you observe, the last row of the row echelon form has [0 0 0 0], which means, we have more variables and less number of equations, and hence infinite solutions.
+
+### Test Case 5:
+Solve the following system of equations (4 variables):
+
+$$x1 + 2.x2 + 3.x3 + x4 = -10$$
+$$x1 + 3.x3 - x4 = -5 $$
+$$x1 + 8.x2 - x3 + x4 = 5$$
+$$x1 + x2 + x3 + x4 = 50$$
+
+```{r}
+
+A <- matrix(c(1, 2, 3, 1, 1, 0, 3, -1, 1, 8, -1, 1, 1, 1, 1, 1),byrow=T, nrow = 4)
+b <- matrix(c(-10, -5, 5, 50),byrow=T, nrow = 4)
+
+reduced_row_echelon_form(A,b)
+
+```
+
+The solution for the given system of equations is:
+$$x1 = 75.9375$$
+$$x2 = -13.1250$$
+$$x3 = -23.4375$$
+$$x4 = 10.6250$$
+
+

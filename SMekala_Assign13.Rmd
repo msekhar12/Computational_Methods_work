@@ -1,0 +1,159 @@
+---
+title: "SMekala_Assign13"
+author: "Sekhar Mekala"
+date: "Sunday, November 08, 2015"
+output: html_document
+---
+
+##Problem - 1
+Given that $f(x) = x^3 + 2x^2$. 
+
+You can find the derivative of $f(x) = x^3 + 2x^2$ directly also (using the derivative formula $\frac{d(x^n)}{dx} = nx^{n-1}$) as $f'(x) = 3x^2 + 4x$.
+
+We can use the function $f'(x) = 3x^2 + 4x$  to find the derivative of $f(x) = x^3 + 2x^2$ at any given $x$. But we will use the numerical derivative formula to find the derivative, using the following mathematical definition of derivative:
+
+$$f'(x) \approx \frac {f(x + \delta) - f(x)}{\delta}$$
+where $\delta$ is very close to zero.
+
+We will build an R function called **appx_derivative()**, using the formula $f'(x) \approx \frac {f(x + \delta) - f(x)}{\delta}$. To verify our work, we will also build another function **exact_derivative()**. The **exact_derivative()** is based on the functional form of the derivative $f'(x) = 3x^2 + 4x$.  Each of these functions will accept a number as input and returns the derivative value of the function $f(x) = x^3 + 2x^2$ at the given input value. Since the function is polynomial, it is continuous for all real numbers, and hence we need not check if the derivative actually exists at a given value.
+
+###R Code for **appx_derivative()** function
+We will assume $\delta$ as 1e-6 to compute the derivative of the function at a given value. This approach will give an approximate value of the derivative, at a given value. 
+
+```{r}
+appx_derivative <- function(a){
+       b = a + 1e-6
+
+       return (((b^3+2*b^2 - (a^3 + 2*a^2))/1e-6))
+              
+  }
+```
+
+###R Code for **exact_derivative()** function
+We will use the derivative obtained using the derivative formula ($f'(x) = 3x^2 + 4x$) to implement this function.
+
+```{r}
+exact_derivative <- function(a){
+       
+       return(3*a^2+4*a)
+              
+  }
+```
+
+
+###Test cases:
+We will use the **appx_derivative()** function for certain numbers, and check how close are we to the acutal answer (using **exact_derivative()**) function: 
+
+```{r}
+appx_derivative(3)
+exact_derivative(3)
+appx_derivative(-3)
+exact_derivative(-3)
+appx_derivative(399.111)
+exact_derivative(399.111)
+appx_derivative(399)
+exact_derivative(399)
+```
+The above test cases show that our approximation to derivative closely resembles the actual derivative value obtained using the functional form of derivative.
+
+
+
+##Problem - 2
+
+Given that $f(x) = 3x^2 + 4x$. We need to find the following:
+$$\int_{1}^{3} 3x^2 + 4x dx$$ 
+
+Let us plot this function, in the given interval:
+```{r}
+curve(3*x^2 + 4*x,from=0,to=5,type="l" )
+
+x <- seq(from=1,to=3,length=10)
+y_low <- rep(0,10)
+y_high <- 3*(x^2) + 4*x
+
+lines(x,y_low,col='grey')
+lines(x,y_high,col='grey')
+
+polygon(c(x, rev(x)), c(y_high, rev(y_low)),
+     col = "blue", border = NA)
+     
+
+```
+
+We need to determine the shaded area size. Let us assume that this area is divided into many rectangles with the smallest width (say 1e-6), and the length of the rectangle is given by the function $3x^2 + 4x$. The sum of the areas of all such rectangles will give us the area of the shaded region, shown above.
+
+Area of a rectangle is given by LxW (where L = length and W = width)
+
+Therefore the area of the shaded region is given by 
+$$\sum (3x^2+4x) . \delta \mbox{ where }x \in [1,3] \mbox{ and } \delta \mbox{ is a very small value, representing the width of the rectangle} $$
+
+The following R code will evaluate this integral by the summation of all the areas of the rectangles having a width of 1e-6 and length of $3x^2+4x \mbox{where } x \in [1, (1+1^{-6}), (1+(2.10^{-6})),(1+(3.10^{-6})), .... 3]$.
+
+```{r}
+x = 1
+area = 0
+delta = 1e-6
+while(x<=3)
+  {
+  
+  area <- ((3*x^2+4*x) * delta) + area
+  x <- x + delta
+  
+  }
+
+print(area)
+```
+
+Hence the integral evaluates to 41.99998, which is approximately equal to 42.
+
+##Problem - 3
+Evaluate $$\int sin(x) cos(x) dx$$
+
+**Method-1**
+
+Let $t = sin(x)$. Differentiating on both sides with respect to $x$...
+$$\frac{dt}{dx} = cos(x)$$
+$$dt = cos(x) dx$$
+
+Substituting $dt$ in the place of $cos(x) dx$ and $t$ in the place of $sin(x), will make the given integral as 
+$$\int sin(x) cos(x) dx = \int (t) dt$$
+This evaluates to $$\frac {t^2}{2} + C$$
+Substituting back $sin(x)$ in the place of $t$, will give us $$\frac {sin^2(x)}{2} + C$$
+
+Hence, $$\int sin(x) cos(x) dx = \frac {sin^2(x)}{2} + C$$
+
+
+**Method-2**
+
+Integrating by parts:
+$$\int f(x) g(x) dx = f(x) \int g(x) dx - \int f'(x) \int g(x) dx$$
+
+Hence,
+$$\int sin(x) cos(x) dx = sin(x) \int cos(x) dx - \int \frac {d(sinx)}{dx} \int cos(x) dx$$
+$$sin(x) sin(x) - \int cos(x) sin(x) dx$$
+
+Hence $\int sin(x) cos(x) dx = sin^2(x) - \int cos(x) sin(x) dx + C$ 
+This can be re-written as
+$$2 \int sin(x) cos(x) dx = sin^2(x) + C$$
+Hence, $$\int sin(x) cos(x) dx = \frac {sin^2(x)}{2} + C$$
+
+
+
+##Problem - 4
+Evaluate $$\int x^2 e^x dx$$
+Integrating by parts,
+$$\int x^2 e^x dx = x^2 \int e^x dx- \int 2x \int e^x dx = x^2 e^x - 2 \int x e^x dx = x^2 e^x - 2 [x \int e^x dx - \int 1 . \int e^x dx] = x^2 e^x - 2x e^x + 2e^x +C$$
+
+Therefore $$\int x^2 e^x dx = x^2 e^x - 2x e^x + 2e^x +C$$
+
+##Problem - 5
+Evaluate $$\frac{d(xcos(x))}{dx}$$
+
+$$\frac{d(xcos(x))}{dx} = \frac{d(x)}{dx} cos(x) + x \frac{d(cox(x))}{dx} = cos(x) + x (-sin(x)) = cos(x) - xsin(x)$$
+
+##Problem - 6
+Evaluate $$\frac{d(e^{x^{4}})}{dx}$$
+$$\frac{d(e^{x^{4}})}{dx} = e^{x^{4}} . 4. x^3 = 4x^3 e^{x^{4}}$$
+
+
+                                      ~~~**End of Assignment**~~~

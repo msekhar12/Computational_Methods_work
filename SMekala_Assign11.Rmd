@@ -1,0 +1,190 @@
+---
+title: "SMekala_Assign11"
+author: "Sekhar Mekala"
+date: "Wednesday, October 28, 2015"
+output: html_document
+---
+##Problem-1:
+
+Given the following data:
+age = (18,23,25,35,65,54,34,56,72,19,23,42,18,39,37)
+maxhr = (202,186, 187, 180, 156, 169, 174, 172, 153, 199, 193, 174, 198, 183, 178)
+
+where **age** variable contains the age of the person and **maxhr** represents the maximum heart rate of the corresponding person.
+
+We need to determine if the **maxhr** variable is dependent on the **age**. We have to express the **maxhr** (dependent variable) in terms of **age** (independent variable), and determine if the slope obtained in the linear equation is different enough (from slope = 0). Let us assume that the linear equation is $maxhr = \beta_{0} + \beta_{1} age$. We will perform hypothesis test at a given significance level (0.01).
+
+Let us define the hypothesis:
+
+###Hypothesis:
+$$H_0: \beta_{1} = 0$$
+$$H_1: \beta_{1} \neq 0$$
+
+##Significance level:
+For this analysis, we will use a significance level of 0.01. We call this as the **required significance level**. The R's lm() and summary() functions also list the significance levels of coefficients of independent variables. Let us call those significance levels as **computed significance level**. As long as the p-value of a coefficient is less than the **required significance level** we will reject the NULL hypothesis. But if we have more than 1 independent variable, then we will first check if the p-value of that variable's coefficient is less than the **required significance level**. If more than one variable's coefficient has a p-value less than the **required significance level** then we will check the **computed significance level**, so that which ever variable has the least significance level, we will consider that variable as the most important variable to measure the dependent variable.
+
+##Analysis:
+Let us obtain the linear equation using the following R code:
+
+```{r}
+age <- c(18,23,25,35,65,54,34,56,72,19,23,42,18,39,37)
+maxhr <- c(202,186, 187, 180, 156, 169, 174, 172, 153, 199, 193, 174, 198, 183, 178)
+
+l <- lm(maxhr~age)
+summary(l)
+
+```
+
+We obtained the following linear equation:
+$maxhr = 210.0485 - 0.7977 age$
+
+
+###Intrepretation of results
+The above display also shows that the p-value of the slope is significantly less than 0.01 (**required significance level**). Hence we reject the null hypothesis. We can conclude that the **maxhr** is depenedent on the **age** of the person and the effect of **age** on **maxhr** is significant. As per the linear equation summary, the obtained p-value for the slope is less than 0.001 (this is the **computed significance level**, which is less than our **required significance level**). **NOTE that in statistical analysis, we must choose a desired significance level, before looking at the data, so that we do not tweak our signicance levels to purposefully accept/reject the NULL hypothesis.**     
+
+Plotting the linear regression equation, along with the data
+
+```{r}
+
+plot(maxhr~age, col = "blue", pch = 19, main = "Age and MaxHR plot")
+l <- lm(maxhr~age)
+abline(l, col="red")
+#coef(l)
+if (coef(l)[2] > 0) eq = paste0("maxhr =", round(coef(l)[1],4),"+",round(coef(l)[2],4), "age")
+if (coef(l)[2] == 0) eq = paste0("maxhr =", round(coef(l)[1]),4)
+if (coef(l)[2] < 0) eq = paste0("maxhr =", round(coef(l)[1],4),"-",round(coef(l)[2],4), "age")
+mtext(eq, 3, line=-2)
+```
+
+
+
+##Problem-2:
+
+Reading the data from Auto dataset.
+
+Reading the file's data into a data frame:
+
+```{r}
+#setwd("C:/Users/Sekhar/Documents/R Programs/MSDA 605 - Comp methods")
+#df <- read.csv("auto-mpg.data", header = F, sep = "")
+#head(df)
+#nrow(df)
+#names(df)
+```
+
+
+```{r}
+df <- read.csv("auto-mpg.data", header = F, sep = "")
+head(df)
+nrow(df)
+names(df)
+```
+
+The above display confirms that we have successfully read 392 records from the file into the **df** data frame. But the column names of the data frame are randomly assigned. Let us give proper column names:
+
+```{r}
+names(df) <- c("displacement", "horsepower", "weight", "acceleration","mpg")
+```
+
+Let us model **mpg** as a function of **displacement**, **horsepower**, **weight**, **acceleration**
+
+```{r}
+l <- lm(df$mpg ~ df$displacement + df$horsepower + df$weight + df$acceleration)
+print(l)
+```
+
+We obtained the following linear model for **mpg**:
+$$mpg = 45.251140 - 0.006001 displacement - 0.043608 horsepower - 0.005281 weight - 0.023148 acceleration$$
+
+###Checking which variables have the most significant impact on the **mpg** variable
+
+###Hypothesis:
+$$H_0: \mbox{The coefficients of displacement, horsepower, weight, acceleration are zeros}$$
+$$H_1: \mbox{The coefficients of displacement, horsepower, weight, acceleration are NOT zeros}$$
+
+The null hypothesis ($H_0$) states that the **mpg** is indepenednt of **displacement**, **horsepower**, **weight** and **acceleration**, and we obtained non-zero coefficients in the model $mpg = 45.251140 - 0.006001 displacement - 0.043608 horsepower - 0.005281 weight - 0.023148 acceleration$ 
+by pure random chance. We will get the p-values of these independent variable's coefficient, and compare those p-values with our target significance level (0.01). If the p-values are less than the significance level of 0.01, then we will reject the null hypothesis. The p-value is nothing but the probability of getting the given non-zero coefficients randomly, given that the null hypothesis is true.
+
+##Significance level:
+For this analysis, we will use a significance level of 0.01 (**required significance level**). But the lm() and summary() functions of R may give different significance levels for the coefficients of the independent variables. We call those significance levels as **computed significance levels** 
+
+##Analysis:
+Let us display the p-values of all the variables, using the **summary()** command:
+
+```{r}
+summary(l)
+
+```
+
+From the above display, the p-values for weight, and horsepower are less than 0.01 (our **required significance level**). If you observe closely, the **weight** variable's p-value is the least, and it is much lower than the **computed significance level** of 0.001. Hence the **weight** variable has a significant impact on the **mpg** variable. The next significant variable is **horsepower**, since its p-value is lesser than our **required significance level** (0.01). All other variables are having p-values which are greater than 0.01 (**required siginficance level**). Hence, if we model **mpg** as a linear function of the other variables, then the **weight** and **horsepower** variables have a significant impact on the **mpg** variable (at a 0.01 level of significance). Of the **weight** and **horsepower**, the **weight** variable has the most significant impact on the **mpg** (since its **computed significance level** is the least) . NOTE that we evaluated linear function. We may obtain a better model (for **mpg**), if we consider other non-linear models.
+
+Hence we reject null hypothesis for the **weight** and **horsepower** variables, and we are not able to reject the null hypothesis for **displacement** and **acceleration** variables.
+
+
+The standard errors and significance levels of all the independent variables coefficients are displayed below:
+
+```{r}
+library("knitr")
+p_df <- data.frame(variable = c('displacement', 'horsepower', 'weight', 'acceleration'), std_error = c(0.0067093,0.0165735,0.0008109,0.1256012), significance = c(1,0.01,0.001,1))
+
+kable(p_df)
+```
+
+The **mpg** variable is dependent on **weight** variable, followed by **horsepower** variable. 
+
+Let us measure the ranges of coefficients with 95% confidence level.
+
+```{r}
+confint(l,level=0.95)
+```
+
+##Performing the same linear regression analysis using 40 random observations
+
+```{r}
+set.seed(10)
+s <- sample(1:392, 40, replace = F)
+df_rand = df[s,]
+
+l_rand <- lm(df_rand$mpg ~ df_rand$displacement + df_rand$horsepower + df_rand$weight + df_rand$acceleration)
+print(l_rand)
+```
+
+The linear regression obtained on a simple random sample of 40 observations is given below:
+
+$$mpg = 44.117698 - 0.023242 displacement - 0.006429 horsepower - 0.005408 weight - 0.076267 acceleration$$
+
+Let us display the std. errors, p-values and significance levels of the coefficients of independent variables in the abve equation (which is obtained from a simple random sample of 40 observations):
+
+```{r}
+summary(l_rand)
+```
+
+You can see that none of the p-values of the coefficients of the varibles is less than 0.01 (our target significance level). Based on the 40 observations, we cannot reject the NULL hypothesis (which means that the **mpg** is independent of all other variables). For **40 random sample**, all the independent variables coefficients has a **significance level of 1**.
+
+Let us measure the ranges of coefficients of sample data (40 observations), with 95% confidence level.
+
+```{r}
+confint(l_rand,level=0.95)
+```
+
+Let us display the ranges of coefficients of sample data (392 observations), with 95% confidence level again (so that we can compare with 40 observations test easily).
+
+```{r}
+confint(l,level=0.95)
+```
+##Conclusion
+You can observe that in case of 392 sample size we obtained a smaller interval range, while for 40 sample size, we obtained a wider interval range. Also we can clearly observe that the significance levels also changed considerably, as the sample size changed from 392 to 40. Hence we can conclude that as the sample size increases, we will get a smaller confidence interval, for a given confidence level. Also bigger sample sizes will closely resemble the true population parameter.
+
+#Extra analysis  
+
+##Visual analysis
+Let us plot scatter plots across all the variables of the auto data set, and see which variables are associated (by observing any pattern in the plots)
+
+```{r}
+pairs(~mpg+displacement+horsepower+weight+acceleration,data=df, main="Auto data set scatter plot (392 sample size)")
+pairs(~mpg+displacement+horsepower+weight+acceleration,data=df_rand, main="Auto data set scatter plot (40 sample size)")
+``` 
+
+The 392 observations scatter plots show that we can see a clear association between mpg and other variables (except the acceleration). However in case of 40 observations scatter plots, that association is not clearly visible.
+
+                                              ~~~**End of Home Work**~~~

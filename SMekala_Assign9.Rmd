@@ -1,0 +1,240 @@
+---
+title: "SMekala_Assign9"
+author: "Sekhar Mekala"
+date: "Tuesday, October 20, 2015"
+output: html_document
+---
+
+##Problem set 1
+
+###(1)
+
+Given the following Probability Density Function (PDF):
+
+$$f(x) = x, 0 \leq x \leq 1$$
+$$f(x) = 2 - x, 1 < x \leq 2$$
+
+Let us get the Cumulative Distribution Function (CDF). 
+
+###Derivation of CDF (for problem 1)
+
+$${\displaystyle \int_{0}^{x} (x) dx, \mbox{when x} \in [0,1]}$$
+$$F(x) = {\frac{x^2}{2} + C \mbox{ when x} \in [0,1]}, \mbox{where C is a constant}$$
+But the above CDF must evaluate to 0.5, for $x \leq 1$. 
+
+$$\therefore \frac{1^2}{2} + C = 0.5$$
+$$C = 0$$
+
+Hence the CDF when $x \in [0,1]$ is $\frac{x^2}{2}$
+
+Let us get the CDF when $x \in [1,0]$.
+$${\displaystyle \int_{1}^{x} (2 - x) dx, \mbox{ when x } \in (1,2]}$$
+$$F(x) = {2x - \frac{x^2}{2} + C \mbox{ when  x } \in (1,2]}, \mbox{where C is a constant}$$
+But the above CDF must evaluate to 1, for $x \leq 2$.
+
+$$\therefore 2 (2) - \frac{2^2}{2} + C = 1$$
+$$4 - 2 + C = 1$$
+$$ C = -1$$
+
+Hence the CDF when $x \in [1,2]$ is $2x - \frac{x^2}{2} - 1$
+
+Finally, we can write the CDF as shown below:
+
+$$F(x) = \left\{ \begin{array}{rc1}\frac{x^2}{2} & \mbox{for} & 0 \leq x \leq 1 \\2x - \frac{x^2}{2} -1 & \mbox{for} & 1 < x \leq 2 \\0 & \mbox{otherwise} \end{array}\right.$$
+
+###Finding the inverse of CDF (for problem 1)
+We need to find the inverse function(s) of CDF, in order to translate a probability to a value in the sample space, and thus obtaining the random sample.
+
+Deriving the Inverse of CDF when $x \in [0,1]$
+ $$\frac{x^2}{2} = y$$
+ Solving for x (treat $y$ as a constant)
+ $$x = \sqrt{2y}$$
+ Substitute $y = x$, to obtain the final CDF ($x \in [0,1]$)
+ $$\mbox{Inverse of the CDF, when x} \in [0,1] \mbox{ is } F^{-1}(x) = \sqrt{2x}$$
+ 
+
+Deriving the Inverse of CDF when $x \in (1,2]$
+ $$2x - \frac{x^2}{2} - 1 = y$$
+ Solving for x (treat $y$ as a constant)
+ $$x = 2 \pm \sqrt{2 - 2y}$$
+ 
+ But We have to ignore the $x = 2 + \sqrt{2 - 2y}$, since the value obtained will lie outside the range of the possible sample values. 
+ 
+ Substitute $y = x$, to obtain the final CDF (when $x \in (1,2]$)
+ $$\mbox{Inverse of the CDF, when x} \in (1,2] \mbox{ is } F^{-1}(X) = 2 - \sqrt{2 - 2x}$$
+
+The complete inverse CDF is given below:
+
+$$F^{-1}(x) = \left\{ \begin{array}{rc1}\sqrt{2x} & \mbox{for} & 0 \leq x \leq 0.5 \\2 - \sqrt{2 - 2x} & \mbox{for} & 0.5 < x \leq 1 \end{array}\right.$$
+
+The following R code creates a function that returns a sample value randomly for the given PDF. We will select a random value between 0 and 1 (uniformly), and find for what value of sample we could obtain this probability.
+
+
+```{r}
+
+getsample_1 <- function(y)
+  {
+  #The input "y" value must be in the range of [0,1]
+  
+  return(ifelse( y < 0.5, sqrt(2*y), 2 - sqrt(2 - 2*y)) )
+  
+  }
+
+
+```
+
+
+###(2)
+
+Given the following Probability Density Function (PDF):
+
+$$f(x) = 1 - x, 0 \leq x \leq 1$$
+$$f(x) = x - 1, 1 < x \leq 2$$
+
+Let us get the CDF.
+
+###Derivation of CDF (for problem 2)
+
+$${\displaystyle \int_{0}^{x} (1 - x) dx, when x \in [0,1]}$$
+$$F(x) = x - {\frac{x^2}{2} + C \mbox{ when x } \in [0,1]}, \mbox{where C is a constant}$$
+But the above CDF must evaluate to 0.5, for $x \leq 1$. 
+
+$$\therefore 1 - \frac{1^2}{2} + C = 0.5$$
+$$C = 0$$
+
+Hence the CDF when $x \in [0,1]$ is $x - \frac{x^2}{2}$
+
+Let us get the CDF when $x \in (1,0]$.
+$${\displaystyle \int_{1}^{x} (x - 1) dx, \mbox{ when x } \in (1,2]}$$
+$$F(x) = {\frac{x^2}{2} -x + C \mbox{ when x } \in (1,2]}, \mbox{ where C is a constant}$$
+But the above CDF must evaluate to 1, for $x \leq 2$.
+
+$$\therefore \frac{2^2}{2} - 2 + C = 1$$
+$$2 - 2 + C = 1$$
+$$ C = 1$$
+
+Hence the CDF when $x \in [1,2]$ is $\frac{x^2}{2} - x + 1$
+
+Finally, we can write the CDF as shown below:
+
+$$F(x) = \left\{ \begin{array}{rc1}x - \frac{x^2}{2} & \mbox{for} & 0 \leq x \leq 1 \\\frac{x^2}{2} -x + 1 & \mbox{for} & 1 < x \leq 2 \\0 & \mbox{otherwise} \end{array}\right.$$
+
+
+###Finding the inverse of CDF (for problem 2)
+We need to find the inverse functio(s) of CDF, in order to translate a probability to a value in the sample space, and thus obtaining the random sample.
+
+Inverse of CDF when $x \in [0,1]$
+ $$x - \frac{x^2}{2} = y$$
+ Solving for x (treat $y$ as a constant)
+ $$x = 1 \pm \sqrt{1 - 2y}$$
+ Substitute $y = x$, to obtain the final Inverse CDF ($x \in [0,1]$)
+ 
+ But we will ignore the $1 + \sqrt{1 - 2y}$, since the sample values could go out of range, when $y = 0$.
+ 
+ $$\mbox{Inverse of the CDF, when x} \in [0,1] \mbox{ is } F^{-1}(X) = 1 - \sqrt{1 - 2y}$$
+ Hence the CDF when $x \in [0,1]$, is $F^{-1}(x) = 1 - \sqrt{1 - 2x}$
+ 
+Inverse of CDF when $x \in (1,2]$
+ $$\frac{x^2}{2} - x + 1 = y$$
+ Solving for x (treat $y$ as a constant)
+ $$x = 1 \pm \sqrt{2y - 1}$$
+ 
+ But We have to ignore the $x = 1 - \sqrt{2y - 1}$, since the value obtained will lie outside the range of the possible sample values. 
+ 
+ Substitute $y = x$, to obtain the final CDF (when $x \in (1,2]$)
+ $$\mbox{Inverse of the CDF, when x} \in (1,2] \mbox{ is } F^{-1}(X) = 1 + \sqrt{2x - 1}$$
+
+The following R code creates a function that returns a sample value randomly for the given PDF. We will select a random value between 0 and 1 (uniformly), and find for what value of x (probability) we could obtain this sample value.
+
+The complete inverse CDF is given below:
+
+$$F^{-1}(x) = \left\{ \begin{array}{rc1}1 - \sqrt{1 - 2x} & \mbox{for} & 0 \leq x \leq 0.5 \\1 + \sqrt{2x - 1} & \mbox{for} & 0.5 < x \leq 1  \end{array}\right.$$
+
+
+The R function to generate random values from the given PDF is written below.
+
+```{r}
+
+getsample_2 <- function(y)
+  {
+  #The input "y" value must be in the range of [0,1]
+  
+  return(ifelse( y < 0.5, 1 - sqrt(1 - 2*y), 1 + sqrt(2*y - 1)) )
+  
+  }
+
+```
+
+
+###(3)
+
+Let us draw 1000 samples from the first PDF (problem 1) and second PDF (problem 2), and plot the histograms:
+```{r}
+hist(sapply(runif(1000), getsample_1),xlab = "samples", ylab = "frequency", main = "Problem 1 samples frequency histogram", col = "lightgreen")
+hist(sapply(runif(1000), getsample_2),xlab = "samples", ylab = "frequency", main = "Problem 2 samples frequency histogram", col = "yellow")
+```
+
+Let us plot the original functions:
+
+```{r}
+x1 <- runif(10000,min = 0, max = 2)
+y1 <- ifelse(x1 > 1, 2 - x1, x1)
+
+plot(x1,y1, main = "Problem 1 graph between x and f(x)", xlab = "x", ylab = "f(x)")
+
+x2 <- runif(100000,min = 0, max = 2)
+y2 <- ifelse(x2 > 1, x2 - 1, 1 - x2)
+
+plot(x2,y2,main = "Problem 2 graph between x and f(x)", xlab = "x", ylab = "f(x)")
+```
+
+Our 1000 samples plot (histogram) matches the shape of the PDF. Hence our random generator functions are correct.
+
+###(4)
+Let us write a function **clt_verify**, which takes a number and a function name and returns the mean value obtained by averaging the function's output (numeric). Our intention is to pass **getsample_1(y)** and **getsample_2(y)** functions to this **clt_verify** function, and plot the histograms, to verify the Central Limit Theorem. We are passing the function name as an argument to another function (**clt_verify**).
+
+The R code for **clt_verify** is given below:
+
+```{r}
+clt_verify <- function(n, icdf)
+{
+  
+#Input parms: 
+  #n - executes the function passed in "icdf" parm, n times.
+  #icdf - function name
+#Output:
+  #Returns the mean value of the function's (present in "icdf" parm) return value, after the function is called "n" times
+#fun <- match.fun(icdf)
+#return(mean(sapply(runif(n), fun)))
+return(mean(sapply(runif(n), icdf)))
+}
+```
+
+Let us use clt_verify() function to call "getsample_1" and "getsample_2" functions, (30 times each), and repeat this 1000 times, and plot the histograms of the average values obtained.
+
+```{r}
+hist(replicate(1000,clt_verify(30,"getsample_1")), main = "Sampling from PDF of problem 1, with 30 samples", xlab = "Avg. of 30 samples", col = "lightgreen")
+hist(replicate(1000,clt_verify(30,"getsample_2")), main = "Sampling from PDF of problem 2, with 30 samples", xlab = "Avg. of 30 samples", col = "yellow")
+```
+
+The above display shows that we will get normal distribution, when we plot all the averages obtained by sampling from a population, and the normal distribution is centered around the mean of the actual population. Also NOTE that irrespective of the PDF of the population, the averages of the samples always be normal, and will be centered around the population mean. Hence the central limit theorem is verified.
+
+###(5)
+Let us set n = 10, and verify if the above conclusion (from problem 4) still holds correct.
+
+```{r}
+g <- replicate(1000,clt_verify(10,"getsample_1"))
+#h <- hist(g, main = "Sampling from PDF of problem 1, with 10 samples", xlab = "Avg. of 10 samples", col = "lightgreen")
+h <- hist(g, xlab = "Avg. of 10 samples", col = "lightgreen")
+xfit<-seq(min(g),max(g),length=40) 
+    yfit<-dnorm(xfit,mean=mean(g),sd=sd(g)) 
+    yfit <- yfit*diff(h$mids[1:2])*length(g) 
+    lines(xfit, yfit, col="black", lwd=2)
+
+hist(replicate(1000,clt_verify(10,"getsample_2")), main = "Sampling from PDF of problem 2, with 10 samples", xlab = "Avg. of 10 samples", col = "yellow")
+
+```
+
+For a sample size of 10, the central limit theorem still holds correct.
+
+                                            ~~~**End of Home Work**~~~

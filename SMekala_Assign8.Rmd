@@ -1,0 +1,94 @@
+---
+title: "SMekala_Assign8"
+author: "Sekhar Mekala"
+date: "Monday, October 12, 2015"
+output: html_document
+---
+
+##Problem set 1
+Given that 
+
+Probability of going by train $= P(T) = 20/30 = 2/3$
+Probability of going by bus $= P(B) = 10/30 = 1/3$
+Probability of reaching the office on-time, if travels by train $= P(Ontime | T) = 0.9$
+Probability of reaching the office late, if travels by train $= P(late | T) = 1 - P(On-time | T) = 0.1$
+Probability of reaching the office on-time, if travels by bus $= P(Ontime | B) = 0.5$
+Probability of reaching the office late, if travels by bus $= P(late | B) = 1 - P(Ontime | B) = 0.5$
+
+It was given that she was reached on-time today, and we are asked to find, what is the probability that she travelled by bus?
+
+$P(B | ontime) = \frac {P(ontime | B) . P(B)}{P(ontime | B) . P(B) + P(ontime | T) . P(T)}$
+
+$P(ontime | B) . P(B) + P(ontime | T) . P(T) = 0.5 . (1/3) + 0.9 . (2/3) = 0.7667$
+
+Therefore $P(B | ontime) = \frac {0.5 . (1/3)}{0.7667} = \frac{0.1667}{0.7667} = 0.21738$
+
+Therefore, there is (approximately) **21.74%** chance that she came by bus.
+
+
+##Problem set 2
+
+The R code to read the given data into a Bayesian network
+
+```{r}
+library(gRain)
+hl <- c("low","high")
+yn <- c("no","yes")
+
+
+d <- cptable(~difficulty, values=c(0.3,0.7),levels=yn)
+i <- cptable(~intelligence, values=c(0.8,0.2),levels=hl)
+
+g.di <- cptable(~grade|intelligence:difficulty, values= c(0.6, 0.4, 0.01, 0.99, 0.8, 0.2, 0.1, 0.9),levels=hl)
+
+s.i <- cptable(~SAT|intelligence, values= c(0.9, 0.1, 0.2, 0.8),levels=hl)
+
+l.g <- cptable(~letter|grade, values= c(0.9, 0.1, 0.05, 0.95),levels=hl)
+
+
+
+plist <- compileCPT(list(d, i, g.di, s.i, l.g))
+
+
+
+chest_n <- grain(plist)
+plot(chest_n)
+
+```
+
+Displaying the current probabilities:
+
+```{r}
+(querygrain(chest_n, nodes=c("difficulty","intelligence","grade", "SAT", "letter"), type="marginal"))
+```
+
+Now updating the knowledge that the student has received a high "letter" of recommendation
+
+```{r}
+chest_n.1 <- setFinding(chest_n,nodes=c("letter"), states=c("high"))
+(querygrain(chest_n.1, nodes=c("difficulty","intelligence","grade", "SAT", "letter"), type="marginal"))
+```
+
+The above display shows that the updated probability of "difficulty"
+
+Now updating the knowledge that the SAT score is high and also the letter of recommendation as high. The following display shows the updated probability of the course difficulty.
+
+```{r}
+chest_n.2 <- setFinding(chest_n,nodes=c("SAT", "letter"), states=c("high", "high"))
+(querygrain(chest_n.2, nodes=c("difficulty","intelligence","grade", "SAT", "letter"), type="marginal"))
+```
+
+
+If you observe, the difficulty of the course ("yes" option) has increased, if both SAT and letter of recommendation are set to high (when compared to the event that just letter of recommendation is high).
+
+Let us see if there is any effect on the course difficulty, if we just set the SAT score to high
+
+```{r}
+chest_n.3 <- setFinding(chest_n,nodes=c("SAT"), states=c("high"))
+(querygrain(chest_n.3, nodes=c("difficulty","intelligence","grade", "SAT", "letter"), type="marginal"))
+```
+
+You can observe that the difficulty has not changed, with the knowledge that the SAT score is high.
+
+
+                                              ~~~**End of Home work**~~~

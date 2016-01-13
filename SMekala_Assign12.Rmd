@@ -1,0 +1,51 @@
+---
+title: "SMekala_Assign12"
+author: "Sekhar Mekala"
+date: "Sunday, November 01, 2015"
+output: html_document
+---
+
+The following R code reads the file, and gets the cross validation error, for various degrees of polynomials (ranging from 1 to 10 degrees). It then plots the cross validation error for each polynomial degree. In general, as the degree of polynomial increases, the flexibility increases, and this will increase the variance of the model, but it will decrease the bias. On the other hand, lower the polynomial degree, lower is the flexibility, lower is the variance and higher is the bias. We need to identify an optimal polynomial degree where both the variance and bias are minimized. Since we do not have test data, we will be using the k-fold cross validation. In this validation, we will divide the training data into $k$ number of groups (randomly), and fit our model on $k-1$ groups data, and evaluate the model on the remaining $k^{th}$ group's data. This process is repeated until we obtain the Mean Squared Error ($MSE$) on all the $k$ groups data. The average of $MSE$ is then the predicted test data's $MSE$ (for a given polynomial degree). This evaluation is repeated for various degrees of polynomials (1 to 10 in our code below), and the resulting $MSE$ is poltted against the degrees of polynomial. We will then consider the model which has the least cross validation error.
+
+```{r}
+library("boot")
+df <- read.csv("auto-mpg.data", header = F, sep = "")
+head(df)
+nrow(df)
+names(df)
+```
+
+Changing the names of the data frames' columns:
+```{r}
+names(df) <- c("displacement", "horsepower", "weight", "acceleration","mpg")
+```
+
+R code to select the optimal polynomial degree:
+
+```{r}
+cv.err10 = rep(0,10)
+for (i in 1:12){
+#set.seed(10)
+glm.fit = glm(mpg~poly(displacement + horsepower + weight + acceleration ,i),data=df)
+cv.err10[i]=cv.glm(df,glm.fit,K=5)$delta[1]
+}
+
+degree=1:12
+plot(degree,cv.err10,type='b',xlab = "Polynomial Degree", ylab = "Cross validation error", main = "Optimal polynomial degree selection")
+```
+
+The above plot shows that, for a polynomial degree of 2, we will obtain the least cross validation error. Hence we will select the following model
+
+```{r}
+set.seed(10)
+glm.fit = glm(mpg~poly(displacement + horsepower + weight + acceleration ,degree=2,raw=T),data=df)
+print(glm.fit)
+```
+
+**NOTE:** I had to use the "raw=T" option in "poly()" function, to avoid using orthogonal polynomials
+
+The following model is the optimal model obtained out of the above analysis:
+
+$$ mpg = 61.33 - 1.643^{-2} (displacement + horsepower + weight + acceleration) + 1.375^{-6} (displacement + horsepower + weight + acceleration)^2$$
+
+                                            ~~~**End of Home Work**~~~

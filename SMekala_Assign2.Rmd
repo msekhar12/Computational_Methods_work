@@ -1,0 +1,274 @@
+---
+title: "SMekala_Assign2"
+author: "Sekhar Mekala"
+date: "Friday, September 04, 2015"
+output: html_document
+---
+##Problem set 1
+##(1)
+
+Let **$A$** be a *$mXn$* matrix. Then **$A^{T}$** will be *$nXm$* matrix. That is, **$A$** has *$m$* rows and *$n$* columns, while **$A^{T}$** will have *$n$* rows and *$m$* columns.
+
+Whenever you multiply two compatible matrices (compatible matrices means, the number of columns of the first matrix is equal to the number of rows of the second matrix) the resulting matrix will have the number of rows of the first matrix and the number of columns of the second matrix.
+
+Therefore, the multiplication **$A.A^{T}$** will result in *$mXm$* matrix. The multiplication **$A^{T}.A$** will result in *$nXn$* matrix. Since the resulting matrices sizes are not same, we can say that, in general, **$A.A^{T} \neq A^{T}.A$**
+
+###Example
+Let $A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 & 3 \\ 4 & 5 & 6 \end{array} \right]$, then **$A^{T}$** will be $A^T = \mbox{} \left[ \begin{array}{cc} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{array} \right]$
+
+Then, 
+**$$A.A^{T} = \mbox{} \left[ \begin{array}{ccc} 14 & 32 \\ 32 & 77 \end{array} \right]$$** and 
+**$$A^{T}.A = \mbox{} \left[ \begin{array}{ccc} 17 & 22 & 27 \\ 22 & 29 & 36 \\ 27 & 36 & 45 \end{array} \right]$$** 
+
+Hence, for the example matrices, we have **$A.A^{T} \neq A^{T}.A$**
+
+Even for square matrices also, in general **$A.A^{T} \neq A^{T}.A$**. Consider the matrix:
+$A = \mbox{} \left[ \begin{array}{ccc} 1 & 2 \\ 3 & 4 \end{array} \right]$, then **$A^{T}$** will be $A^T = \mbox{} \left[ \begin{array}{cc} 1 & 3 \\ 2 & 4 \end{array} \right]$
+
+Then, 
+**$$A.A^{T} = \mbox{} \left[ \begin{array}{ccc} 5 & 11 \\ 11 & 25 \end{array} \right]$$** and 
+**$$A^{T}.A = \mbox{} \left[ \begin{array}{ccc} 10 & 14 \\ 14 & 20 \end{array} \right]$$** 
+
+Hence, for these example matrices also, we have **$A.A^{T} \neq A^{T}.A$**. See below for more information on why the $A.A^{T} \ne A^{T}.A$, for square matrices also, except for a special case of symmetric matrix.
+
+
+##(2)
+
+But there are some cases where we have some matrices for which $A = A^{T}$. Such matrices are called **Symmetric Matrices**. A **symmetric matrix** is always a SQUARE matrix. But all SQUARE Matrices are NOT symmetric. Examples of **symmetric matrix** include **Identity matrix, Zero square Matrix, diagonal matrix and any matrix, which is obtained by multiplying a matrix with its transpose (i.e. the result of $A.A^{T}$ is a symmetric matrix and also $A^{T}.A$ is a symmetric matrix)**
+
+Hence, if $A$ is a **symmetric matrix**, then **$A = A^T$** and hence, for **symmetric matrices** **$A.A^{T} = A^{T}.A$**
+
+Some examples of symmetric matrices are given below:
+
+**$$\mbox{} \left[ \begin{array}{ccc} 5 & 11 \\ 11 & 25 \end{array} \right]$$** 
+
+**$$\mbox{} \left[ \begin{array}{ccc} 10 & 14 \\ 14 & 20 \end{array} \right]$$**
+
+If $A$ is a **Symmetric Matrix** of $nXn$ size, then the elements $A[i,j] = A[j,i]$, where $i, j \in \{1,2,3...n\}$
+
+For symmetric matrices **$A = A^T$**, and hence **$A.A^T = A^T.A$**
+
+
+##Problem set 2
+
+Here is the R code to decompose a matrix into LU. I have written the following R functions to decompose a square matrix into LU. But NOTE that NOT all square matrices can be decomposed into LU. Some square matrices require row interchange to reduce the matrix to row echelon form. But if such row interchanges are needed, then it is NOT possible to decompose the given matrix into LU.
+
+
+**find_first_and_divide** - This function accepts a vector, divides the all its elements with the first non-zero element in the vector, appends the location of the first non-zero element in the vector, and also appends the first non-zero value to the resulting vector, and returns the modified vector. For instance if [0 2 4] is the input vector, then the vector being returned is [0 1 2 2 2].
+
+**get_LU_matrix** - This function accepts a square matric as input and outputs a list with 4 components: **msg, original, L, U, LU, and verification**. **msg** contains a brief message, **original** contains the original matrix, **L** is the lower triangle matrix, and **U** is the upper triangular matrix, **LU** contains the product of **L** and **U**, and finally the **verification** component has a TRUE/FALSE Matrix, that checks if the **original** matrix is equal to **LU**. 
+
+NOTE: If LU decomposition is not possible, then an appropriate message is displayed in **msg**, along with the **original** matrix, and the **modified** matrix, for which a row interchange is needed.
+
+For detailed logic, follow the embedded comments in the following R code. 
+
+```{r}
+#find_first_and_divide:
+#This function takes a vector as input. It finds the first non-zero element in the vector, and 
+#divides the remaining elements with the first non-zero element. The position of the non-zero element
+# is appended to the modified vector (after division), the divisor is also appended to the modified vector, and the modified vector is returned
+
+
+find_first_and_divide <- function(x)
+{
+  
+  
+  
+  for( i in 1:length(x))
+  {
+    
+    if(x[i] == 1) return(c(x,i,1))
+    divisor <- x[i]
+    if(x[i] !=0) return( c((x/x[i]),i,divisor))
+    
+  }
+  
+  return(c(x,(i+1),1))
+}
+
+
+## get_u_matrix will apply the elementary row operations on the input matrix, and returns a list with modified matrix (U) or a message, if the modification fails.
+#  The function can apply all the row operations, except the row interchange operation. If rows have to be interchanged, then it is not possible to convert a square matrix into LU decomposition
+
+
+get_LU_matrix <- function(m)
+  
+{
+  if(is.matrix(m))
+  {
+    #find the first non-zero element in each row, and divide the other elements by the first non-zero element
+    original <- m
+    m_rows <- nrow(m)
+    m_cols <- ncol(m)
+    
+    
+    m_mod <- matrix(nrow = m_rows, ncol =( m_cols+1))
+    operation_tracker <- matrix(nrow = m_rows, ncol = 2)
+    operation_tracker[,2] <- 1:m_rows
+    
+    if(m_rows != m_cols) return(list(msg="The given matrix is not a square matrix. LU Decomposition is not possible", original = original))
+    
+    e_matrix <- diag(m_rows)
+    L <- diag(m_rows)
+    e_matrix_temp <- diag(m_rows)
+    
+    repeat{
+      
+      m_mod <- t(apply(m,1,find_first_and_divide))
+      
+      operation_tracker[,1] <- m_mod[,(m_cols+1)]
+      
+      for(i in 1:m_rows)
+      { 
+        #e_matrix is an identity matrix. As per the logic, we need to first divide the [i,i] element of e_matrix with m_mod[i,m_cols+2] (which is nothing but the first non-zero element of m)
+        #and after dividing, we have to get the inverse of e_matrix. But since e_matrix is a diagonal matrix, the inverse of diagonal matrix is nothing but a matrix with 
+        #reciprocal of its diagonal elements. This is applicable only if the diagonal elements are non-zeros. So e_matrix[i,i] element has to be just multiplied with m_mod[i,m_cols+2], at appropriate 
+        #row/column position on the diagonal, to obtain the required inverse of e_matrix (elementary matrix)
+        
+        e_matrix[i,i] <- m_mod[i,(m_cols+2)]
+        L <- L %*% e_matrix
+        
+        
+        #instead of allocating a new e_matrix, I am just reverting the operation made on e_matrix, and thus making it as back to identity matrix.
+        e_matrix[i,i] <- 1 
+      }
+      
+      
+      m_mod <- m_mod[,-(m_cols+1):-(m_cols+2)]
+      
+      
+      
+      
+      #The first column of operation_tracker matrix has the position of the first non-zero elements in each row.
+      #The second column of operation_tracker matrix has the row number
+      
+      #The LU Decomposition is NOT possible, if we have to interchange the rows in the elimination process. 
+      #Checking if we have to interchange the rows. If yes, then alert that LU decomposition is not possible, else proceed further
+      
+      #We have to interchange the rows in the elimination process, whenever we have the first non-zero element in a row occurs in the column, which is greater than the corresponding row.
+      
+      #The second condition in the following if statement will make sure that we do not raise alarm, if any of the row(s) have all zeros
+      if(any(operation_tracker[,1] > operation_tracker[,2] & operation_tracker[,1] <= m_cols)) 
+        #      if(any(operation_tracker[,1] > operation_tracker[,2])) 
+        return(list(msg="The given matrix is requires rows interchange in the elimination, and hence LU Decomposition is not possible. Reorder of rows might fix this problem", original = original, modified = m_mod))  
+      
+      
+      
+      if (any(operation_tracker[,1] < operation_tracker[,2]))
+      {
+        pending <- which(operation_tracker[,1] < operation_tracker[,2])
+        for (k in 1:length(pending))
+        {
+          if(m_mod[operation_tracker[pending[k],1],operation_tracker[pending[k],1]] == 0) 
+            return(list(msg="The given matrix is requires rows interchange in the elimination process, and hence LU Decomposition is not possible", original = original, modified = m_mod))  
+          m_mod[pending[k],] <- (m_mod[pending[k],] - m_mod[operation_tracker[pending[k],1],])
+          e_matrix[pending[k],] <- ( e_matrix[pending[k],] - e_matrix[operation_tracker[pending[k],1],] )
+          e_matrix_temp <- solve(e_matrix)
+          L <- L %*% e_matrix_temp
+          
+          #Reverting the change to the identity matrix, so that we can re-use it, instead of allocating again
+          
+          e_matrix[pending[k],] <- ( e_matrix[pending[k],] + e_matrix[operation_tracker[pending[k],1],] )
+          
+        }
+      }
+      
+      else return(list(msg="The L and U matrices along with verification is here", U=m_mod, L=L, original=original, LU = L %*% m_mod, verification = all.equal(original, ( L %*% m_mod))))
+      m <- m_mod
+      
+      
+    }
+    
+    
+    
+  } 
+  else return("Incorrect input. Supply matrix as input")
+  
+}
+
+
+```
+
+
+###Test Case - 1:
+
+```{r}
+x1 <- matrix(c(-2, 1, -1, 1, 2, 3, 3, 0, 1), byrow = T, nrow = 3)
+get_LU_matrix(x1)
+
+```
+
+The **verification** matrix shows that the input matrix is correctly decomposed into LU successfully. The L and U components, along with original matrix and LU matrix are also returned.
+
+
+###Test Case - 2:
+
+We will be decomposing a 6X6 matrix into LU
+
+```{r}
+x2 <- matrix(c(1:36), byrow = T, nrow = 6)
+get_LU_matrix(x2)
+
+```
+
+You can see that the given 6X6 matrix cannot be decomposed into an LU matrix. The modified matrix's 4th row are all zeros, and this is the reason for the need to interchange rows, and if the rows need to be interchanged in the elimination process, then the matrix cannot be decomposed into LU matrix.
+
+###Test Case - 3:
+
+We will be decomposing a 10X10 matrix into LU
+
+```{r}
+x3 <- matrix(c(1:100), byrow = T, nrow = 10)
+get_LU_matrix(x3)
+
+```
+
+You can see that the given 10X10 matrix also cannot be decomposed into an LU matrix. The modified matrix's 5th and 10th rows are identical, and these will become zeros, and also we have to interchange the rows to get the all zero rows to the bottom. If the rows need to be interchanged in the elimination process, then the matrix cannot be decomposed into LU form.
+
+
+###Test Case - 4:
+
+We will be decomposing a 3X5 matrix into LU
+
+```{r}
+x4 <- matrix(c(1:15), byrow = T, nrow = 3)
+get_LU_matrix(x4)
+
+```
+
+In the test case 4, we supplied a non-square matrix (3X5 Matrix), and such non-square matrices do NOT have LU Decomposition.
+
+
+###Test Case - 5:
+
+```{r}
+x5 <- matrix(c(0,1,1,1,-2,-1,1,-1,1), byrow = T, nrow = 3)
+get_LU_matrix(x5)
+
+```
+
+In the test case 5 the matrix needs row interchange (the first row needs to be exchanged with 2nd row or 3rd row, so that we will get 1 in the [1,1] position of the matrix), and hence the LU decomposition is not possible. 
+
+
+###Test Case - 6:
+
+```{r}
+x6 <- matrix(c(1,-2,-1,0,1,1,1,-1,1), byrow = T, nrow = 3)
+get_LU_matrix(x6)
+
+```
+
+In the test case 6 we supplied the same matrix as we supplied in test case 5, but with 1st and 2nd rows interchanged. After the interchange of the 1st and 2nd rows, we are able to express the given matrix in LU form. This is an example which shows that sometimes the order of the columns/rows in the matrix, if changed, will enable us to change a singular matrix to non-singular matrix (and hence we can express the changed matrix in LU form)
+
+
+###Test Case - 7:
+
+```{r}
+x7 <- matrix(c(1,-2,-1,2,1,1,1,-1,1,7,1,2,4,9,1,-1,12,-4,18,9,-20,-2,-2,-3,-4,1,2,3,-35,29,1,40,23,25,12,-9), byrow = T, nrow = 6)
+get_LU_matrix(x7)
+
+```
+In the test case 7, we supplied a 6X6 matrix, and this matrix was successfully expressed into LU form. See the output above.
+
+
+                                             ~~~~ End of Home work 2 ~~~~
